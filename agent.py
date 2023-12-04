@@ -44,7 +44,7 @@ class Brain(object):
         self.optimizer_model = arguments['optimizer']
         self.model = self.build_model()
         self.model_ = self.build_model()
-#hi
+#nina
     def build_model(self):
 
         x = Input(shape=(self.state_size,))
