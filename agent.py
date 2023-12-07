@@ -51,7 +51,8 @@ class Brain(object):
         # design a neural network model Q(s,a)
         # Hidden layers
         hidden_layer = Dense(self.num_nodes, activation="relu")(x)
-        hidden_layer = Dense(128, activation="relu")(hidden_layer)
+        batch_norm = BatchNormalization()(hidden_layer)
+        hidden_layer = Dense(128, activation="relu")(batch_norm)
         hidden_layer = Dense(64, activation="relu")(hidden_layer)
         hidden_layer = Dense(32, activation="relu")(hidden_layer)
         hidden_layer = Dense(16, activation="relu")(hidden_layer)

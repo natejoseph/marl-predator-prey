@@ -96,7 +96,7 @@ class PredatorsPrey(object):
             # , e.g.,
             # positions_idx = [0, 6, 23, 24] where 0, 6, and 23 are the positions of the agents 24 is the position
             # of the prey
-            positions_idx = []
+            positions_idx = [0, 4, 20, 24, 12]
 
         if self.game_mode == 1:
             positions_idx = np.random.choice(len(cells), size=self.num_predators + self.num_preys, replace=False)

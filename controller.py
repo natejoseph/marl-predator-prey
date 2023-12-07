@@ -47,7 +47,7 @@ class controller(object):
         
         for i, x_i in enumerate(x):
             # *** Design y_tot ***
-            y_tot = np.sum(np.array(y_list)[:, i, :], axis = 0) 
+            y_tot = np.sum(np.array(y_list)[:, i, :], axis=0)
             # *** Design y_tot ***
             y_tot_list.append(y_tot)
             
