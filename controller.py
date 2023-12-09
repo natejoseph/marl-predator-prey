@@ -47,7 +47,8 @@ class controller(object):
         
         for i, x_i in enumerate(x):
             # *** Design y_tot ***
-            y_tot = np.sum(np.array(y_list)[:, i, :], axis=0)
+            y_i_list = [agent.brain.predict(np.array([x_i]))[0] for agent in agents]  # Get the Q-values for the current state-action pair from all agents
+            y_tot = np.sum(np.array(y_i_list), axis=0)
             # *** Design y_tot ***
             y_tot_list.append(y_tot)
             
