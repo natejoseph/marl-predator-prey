@@ -13,6 +13,7 @@ from env import PredatorsPrey
 from agent import Agent
 from controller import controller
 import glob
+import psutil
 
 ARG_LIST = ['learning_rate', 'optimizer', 'memory_capacity', 'batch_size', 'target_frequency', 'maximum_exploration',
             'max_timestep', 'first_step_memory', 'replay_steps', 'number_nodes', 'target_type',
@@ -69,6 +70,8 @@ class Environment(object):
         rewards_list = []
         timesteps_list = []
         max_score = -10000
+        done_episodes = 0
+
         for episode_num in xrange(self.episodes_number):
             state = self.env.reset()
             if self.render:
@@ -123,6 +126,9 @@ class Environment(object):
 
             print("Episode {p}, Score: {s}, Final Step: {t}, Goal: {g}".format(p=episode_num, s=reward_all,
                                                                                t=time_step, g=done))
+            if done:
+                done_episodes += 1
+
             if self.recorder:
                 os.system("ffmpeg -r 4 -i ./results_predators_prey/snaps/%04d.png -b:v 40000 -minrate 40000 -maxrate 4000k -bufsize 1835k -c:v mjpeg -qscale:v 0 "
                           + "./results_predators_prey/videos/{a1}_{a2}_{a3}_{a4}_{a5}.avi".format(a1=self.num_predators,
@@ -148,7 +154,16 @@ class Environment(object):
                             for agent in agents:
                                 agent.brain.save_model()
                             max_score = reward_all
+        # Calculate and print the average score
+        average_score = sum(rewards_list) / len(rewards_list)
+        print("Average Score: {}".format(average_score))
 
+        # Print the ratio of episodes where 'done' is True
+        done_ratio = float(done_episodes) / float(self.episodes_number)
+        print("Ratio of episodes where 'done' is True: {:.3%}".format(done_ratio))
+
+        memory_consumption_gb = psutil.virtual_memory().used / (1024.0 ** 3)
+        print("Total Memory Consumption: {:.3f} GB".format(memory_consumption_gb))
 
 if __name__ =="__main__":
     parser = argparse.ArgumentParser()

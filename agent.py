@@ -49,7 +49,7 @@ class Brain(object):
 
     def build_model(self):
         x = Input(shape=(self.state_size,))
-
+        
         # Hidden layers
         h1 = Dense(self.num_nodes, activation='relu')(x)
         batch_norm = BatchNormalization()(h1)
