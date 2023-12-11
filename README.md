@@ -30,9 +30,3 @@ macOS/Linux/Windows (using Anaconda Prompt)
         - For other parameters, please refer to ``main.py``.
     - Example
         - ``python main.py --agents-number 3 --MARLAlgorithm IQL``, where you set three agents and train them with IQL algorithm.
-## Step 3, modify the code and submit everything in a zip/rar file, name it "FirstName_LastName_Project2.zip".
-- Test the neural network by ``python main.py``.
-
-- Test the VDN algorithm by ``python main.py --MARLAlgorithm VDN``.
-
-- Test the prey strategy by ``python main.py -evm 3``.
