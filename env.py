@@ -96,7 +96,7 @@ class PredatorsPrey(object):
             # , e.g.,
             # positions_idx = [0, 6, 23, 24] where 0, 6, and 23 are the positions of the agents 24 is the position
             # of the prey
-            positions_idx = []
+            positions_idx = [0, 4, 20, 24,12]
 
         if self.game_mode == 1:
             positions_idx = np.random.choice(len(cells), size=self.num_predators + self.num_preys, replace=False)
@@ -173,9 +173,40 @@ class PredatorsPrey(object):
     
     def actor_prey_designed(self):
         # The prey strategy you designed (you can refer to 'fix_prey' and 'actor_prey_random' function above)
-        
-        ########################
-        pass
+        prey_position = self.preys_positions[0]
+
+        # Find empty neighboring positions
+        empty_neighbors_pos, action_to_empty_neighbor = self.empty_neighbor_finder(prey_position)
+
+        if empty_neighbors_pos:
+            # Find the farthest position from predators
+            farthest_position = max(empty_neighbors_pos,
+                                key=lambda pos: min([np.linalg.norm(np.array(pos) - np.array(predator)) for predator in
+                                                    self.predators_positions]))
+
+            # Calculate the direction vector to the farthest position
+            direction_to_farthest = np.array(farthest_position) - np.array(prey_position)
+
+            # If the prey is next to a predator, move away from the nearest predator
+            if any(np.linalg.norm(np.array(prey_position) - np.array(predator)) == 1 for predator in self.predators_positions):
+                nearest_predator = min(self.predators_positions,
+                                   key=lambda predator: np.linalg.norm(np.array(prey_position) - np.array(predator)))
+                direction_to_farthest = -np.array(nearest_predator) + np.array(prey_position)
+
+            # Find the corresponding action for the direction to the farthest position
+            try:
+                direction_index = self.A_DIFF.index(tuple(direction_to_farthest))
+            except ValueError:
+                # If the direction to the farthest position is not in the predefined action differences, choose a random action
+                direction_index = random.choice(range(len(self.A_DIFF)))
+
+            chosen_action = direction_index
+        else:
+            # If no empty neighboring positions, stay still
+            chosen_action = self.STAY
+
+        return chosen_action
+
     
     def step(self, predators_actions):
         # update the position of preys

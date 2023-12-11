@@ -13,7 +13,8 @@ from collections import deque
 from keras import backend as K
 from keras.optimizers import *
 from keras.models import Sequential, Model
-from keras.layers import Dense, Lambda, Input, Concatenate, BatchNormalization, Activation
+from keras.layers import Dense, Lambda, Input, Concatenate, BatchNormalization, Dropout
+from keras.layers import Conv1D, MaxPooling1D, Flatten
 
 MAX_EPSILON = 1.0
 MIN_EPSILON = 0.01
@@ -44,23 +45,36 @@ class Brain(object):
         self.optimizer_model = arguments['optimizer']
         self.model = self.build_model()
         self.model_ = self.build_model()
-#hi
+
+
     def build_model(self):
-
         x = Input(shape=(self.state_size,))
-        # design a neural network model Q(s,a)
+        
         # Hidden layers
-        hidden_layer = Dense(self.num_nodes, activation="relu")(x)
-        hidden_layer = Dense(128, activation="relu")(hidden_layer)
-        hidden_layer = Dense(64, activation="relu")(hidden_layer)
-        hidden_layer = Dense(32, activation="relu")(hidden_layer)
-        hidden_layer = Dense(16, activation="relu")(hidden_layer)
-
-        #Output layer
-        z = Dense(self.action_size, activation="relu")(hidden_layer)
+        h1 = Dense(self.num_nodes, activation='relu')(x)
+        batch_norm = BatchNormalization()(h1)
+        h2 = Dropout(0.5)(batch_norm)
+        h3 = Dense(256, activation='relu')(h2)
+        batch_norm = BatchNormalization()(h3)
+        h4 = Dropout(0.5)(batch_norm)
+        h5 = Dense(128, activation='relu')(h4)
+        batch_norm = BatchNormalization()(h5)
+        h6 = Dropout(0.3)(batch_norm)
+        h7 = Dense(64, activation='relu')(h6)
+        batch_norm = BatchNormalization()(h7)
+        h8 = Dropout(0.3)(batch_norm)
+        h9 = Dense(32, activation='relu')(h8)
+        batch_norm = BatchNormalization()(h9)
+        h10 = Dropout(0.2)(batch_norm)
+        h11 = Dense(16, activation='relu')(h10)
+        batch_norm = BatchNormalization()(h11)
+        h12 = Dropout(0.2)(batch_norm)
+        
+        # Output layer
+        z = Dense(self.action_size, activation='relu')(h12)
 
         model = Model(inputs=x, outputs=z)
-        
+
         if self.optimizer_model == 'Adam':
             optimizer = Adam(lr=self.learning_rate, clipnorm=1.)
         elif self.optimizer_model == 'RMSProp':
@@ -69,14 +83,15 @@ class Brain(object):
             print('Invalid optimizer!')
 
         model.compile(loss=huber_loss, optimizer=optimizer)
-        
+
         if self.test:
             if not os.path.isfile(self.weight_backup):
-                print('Error:no file')
+                print('Error: no file')
             else:
                 model.load_weights(self.weight_backup)
 
         return model
+
 
     def predict(self, state, target=False):
         if target:
